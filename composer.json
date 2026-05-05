@@ -13,8 +13,10 @@
 		"php": "^8.1",
 		"ext-curl": "*",
 		"ext-json": "*",
+		"model/assets": "^0.4",
 		"model/core": "^0.4",
-		"model/router": "^0.2"
+		"model/router": "^0.2",
+		"model/settings": "^0.2"
 	},
 	"autoload": {
 		"psr-4": {

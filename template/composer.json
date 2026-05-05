@@ -1,7 +1,9 @@
 {
 	"require": {
+		"model/assets": "^0.4",
 		"model/core": "^0.4",
-		"model/router": "^0.2"
+		"model/router": "^0.2",
+		"model/settings": "^0.2"
 	},
 	"config": {
 		"sort-packages": true
