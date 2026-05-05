@@ -5,8 +5,10 @@ use Composer\Script\Event;
 
 class Installer
 {
+	private const REPOSITORY = 'https://www.netrails.net/repository/';
+
 	private static IOInterface $io;
-	private static string $repository;
+	private static string $repository = self::REPOSITORY;
 	private static string $key;
 	private static array $modules = [];
 	private static array $data = [];
@@ -39,12 +41,6 @@ class Installer
 
 	private static function promptInputs(string $root): void
 	{
-		$repoDefault = 'https://www.netrails.net/repository/';
-		$repository = self::$io->ask('  Repository URL [<comment>' . $repoDefault . '</comment>]: ', $repoDefault);
-		if (substr($repository, -1) !== '/')
-			$repository .= '/';
-		self::$repository = $repository;
-
 		self::$key = trim((string)self::$io->askAndHideAnswer('  License key: '));
 		if (self::$key === '')
 			throw new \RuntimeException('License key is required.');
@@ -317,6 +313,12 @@ class Installer
 		curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($c, CURLOPT_HEADER, 1);
 		curl_setopt($c, CURLOPT_POSTFIELDS, $body);
+
+		$caBundle = \Composer\CaBundle\CaBundle::getSystemCaRootBundlePath();
+		if (is_dir($caBundle))
+			curl_setopt($c, CURLOPT_CAPATH, $caBundle);
+		else
+			curl_setopt($c, CURLOPT_CAINFO, $caBundle);
 
 		$data = curl_exec($c);
 		if (curl_errno($c)) {
