@@ -1,0 +1,9 @@
+{
+	"require": {
+		"model/core": "^0.4",
+		"model/router": "^0.2"
+	},
+	"config": {
+		"sort-packages": true
+	}
+}
