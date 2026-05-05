@@ -31,6 +31,7 @@ class Installer
 		self::downloadFiles($installList, $root);
 		self::copyTemplate($skeletonDir . '/template', $root);
 		self::writeEnv($root);
+		self::runFrameworkSetup($root);
 		self::cleanup($skeletonDir, $root);
 
 		self::$io->write('');
@@ -127,7 +128,7 @@ class Installer
 		$done = 0;
 
 		self::$io->write('');
-		self::$io->write('Downloading ' . $total . ' files...');
+		self::$io->write('Downloading ' . $total . " files...\n");
 
 		foreach (['model', 'config'] as $type) {
 			foreach ($installList[$type] as $relPath) {
@@ -237,6 +238,33 @@ class Installer
 			}
 
 			copy($item->getPathname(), $dest);
+		}
+	}
+
+	private static function runFrameworkSetup(string $root): void
+	{
+		$phpBin = PHP_BINARY;
+		$oldCwd = getcwd();
+		chdir($root);
+
+		try {
+			self::$io->write('');
+			self::$io->write('<info>Initializing modules...</info>');
+
+			$exit = 0;
+			passthru(escapeshellarg($phpBin) . ' index.php zk/init', $exit);
+			if ($exit !== 0)
+				throw new \RuntimeException('zk/init failed (exit code ' . $exit . ').');
+
+			self::$io->write('');
+			self::$io->write('<info>Building module cache...</info>');
+
+			$exit = 0;
+			passthru(escapeshellarg($phpBin) . ' index.php zk/make-cache core_once=1', $exit);
+			if ($exit !== 0)
+				throw new \RuntimeException('zk/make-cache failed (exit code ' . $exit . ').');
+		} finally {
+			chdir($oldCwd);
 		}
 	}
 
