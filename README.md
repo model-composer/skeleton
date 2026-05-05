@@ -4,22 +4,24 @@ Composer create-project template for a ModEl Framework 4 application. Replaces t
 
 ## Usage
 
+From an empty target folder:
+
+```
+composer create-project model/skeleton .
+```
+
+The trailing `.` is important — it tells Composer to install in the current directory rather than create a `skeleton/` subfolder. Alternatively, pass an explicit target name:
+
 ```
 composer create-project model/skeleton my-app
 ```
 
-Composer clones the skeleton, installs `model/core` + `model/router` from the configured Composer repositories, then runs an interactive installer that:
+The installer:
 
-1. Asks for a repository URL and license key (defaults to the existing ModEl repository).
-2. Validates the key against the repository's `?act=get-modules` endpoint.
-3. Lets you pick the legacy ModEl 3 modules to download (`Output` is auto-selected with its dependencies, mirroring `zkinstall.php`).
-4. Downloads the legacy `model/` directory and `app/FrontController.php` from the repository, applying `[zk:*]` placeholder substitution to config files.
-5. Writes a `.env` and prints next steps.
+1. Asks for a license key.
+2. Asks for an app name (defaults to the directory name).
+3. Validates the key against the existing repository's `?act=get-modules` endpoint.
+4. Downloads the legacy `model/Core` + `model/Output` (and their dependencies) plus templated config files into the project root, applying `[zk:*]` placeholder substitution.
+5. Asks for the dev environment name (defaults to `local`) and writes a matching `.env`.
 
-The result is a working ModEl app whose `index.php` boots through the legacy `FrontController` while modern `model/*` Composer packages live alongside in `vendor/`. Add more `model/*` packages with `composer require` as the migration progresses.
-
-## Local testing without publishing
-
-```
-composer create-project --repository="{\"type\":\"path\",\"url\":\"../model4/skeleton\"}" model/skeleton:@dev test-app
-```
+The result is a working ModEl app whose `index.php` boots through the legacy `FrontController` while modern `model/*` Composer packages live alongside in `vendor/`. Add more legacy modules later by editing the install list, or add new Composer packages with `composer require model/<pkg>`.

@@ -37,6 +37,13 @@ class Installer
 		self::$io->write('<info>=== Installation complete ===</info>');
 		self::$io->write('Point your web server at this directory and visit <comment>/readyness.php</comment> to verify.');
 		self::$io->write('Add more model/* packages with <comment>composer require model/<package></comment>.');
+
+		if (basename($root) === 'skeleton') {
+			self::$io->write('');
+			self::$io->write('<warning>Note:</warning> Composer installed into a default <comment>skeleton/</comment> subfolder.');
+			self::$io->write('To install directly in the current folder next time, run:');
+			self::$io->write('  <comment>composer create-project model/skeleton .</comment>');
+		}
 	}
 
 	private static function promptInputs(string $root): void
@@ -47,7 +54,7 @@ class Installer
 
 		$defaultName = basename($root);
 		self::$data['app_name'] = self::$io->ask('  App name [<comment>' . $defaultName . '</comment>]: ', $defaultName);
-		self::$data['path'] = self::$io->ask('  URL path [<comment>/</comment>]: ', '/');
+		self::$data['path'] = '/';
 		self::$data['repository'] = self::$repository;
 		self::$data['key'] = self::$key;
 	}
@@ -68,24 +75,6 @@ class Installer
 	private static function pickModules(): array
 	{
 		$selected = ['Output' => true];
-		self::expandDependencies($selected);
-
-		self::$io->write('');
-		self::$io->write('Available modules (<comment>Core</comment> is always installed):');
-
-		foreach (self::$modules as $mId => $m) {
-			if ($mId === 'Core')
-				continue;
-
-			$default = isset($selected[$mId]) ? 'y' : 'n';
-			$answer = strtolower(trim((string)self::$io->ask('  ' . $mId . ' [<comment>' . $default . '</comment>]: ', $default)));
-
-			if ($answer === 'y' or $answer === 'yes')
-				$selected[$mId] = true;
-			else
-				unset($selected[$mId]);
-		}
-
 		self::expandDependencies($selected);
 
 		foreach (self::$modules as $mId => $m) {
@@ -257,8 +246,7 @@ class Installer
 		if (file_exists($envPath))
 			return;
 
-		$devEnv = self::$io->ask('  Dev environment name [<comment>local</comment>]: ', 'local');
-		file_put_contents($envPath, 'APP_ENV=' . trim($devEnv) . "\n");
+		file_put_contents($envPath, "APP_ENV=development\n");
 	}
 
 	private static function cleanup(string $skeletonDir, string $root): void
