@@ -36,7 +36,7 @@ class Installer
 
 		self::$io->write('');
 		self::$io->write('<info>=== Installation complete ===</info>');
-		self::$io->write('Point your web server at this directory and visit <comment>/readyness.php</comment> to verify.');
+		self::$io->write('Point your web server at this directory to verify.');
 		self::$io->write('Add more model/* packages with <comment>composer require model/<package></comment>.');
 
 		if (basename($root) === 'skeleton') {
@@ -128,7 +128,7 @@ class Installer
 		$done = 0;
 
 		self::$io->write('');
-		self::$io->write('Downloading ' . $total . " files...\n");
+		self::$io->write('Downloading ' . $total . " files...\n\n");
 
 		foreach (['model', 'config'] as $type) {
 			foreach ($installList[$type] as $relPath) {
